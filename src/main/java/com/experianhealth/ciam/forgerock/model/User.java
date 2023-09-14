@@ -47,6 +47,12 @@ import java.util.StringJoiner;
  * }
  */
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.util.List;
+import java.util.StringJoiner;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
@@ -62,15 +68,25 @@ public class User {
     private String postalCode;
     private String country;
     private List<EffectiveRole> effectiveRoles;
+    private List<Application> effectiveApplications;  // Newly added
     private String _rev;
     private String accountStatus;
 
+    // Getters and Setters for all the attributes including the new effectiveApplications
     public String get_id() {
         return _id;
     }
 
     public void set_id(String _id) {
         this._id = _id;
+    }
+
+    public String getSn() {
+        return sn;
+    }
+
+    public void setSn(String sn) {
+        this.sn = sn;
     }
 
     public String getUserName() {
@@ -97,28 +113,12 @@ public class User {
         this.displayName = displayName;
     }
 
-    public String getPostalCode() {
-        return postalCode;
+    public String getPostalAddress() {
+        return postalAddress;
     }
 
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getSn() {
-        return sn;
-    }
-
-    public void setSn(String sn) {
-        this.sn = sn;
+    public void setPostalAddress(String postalAddress) {
+        this.postalAddress = postalAddress;
     }
 
     public String getMail() {
@@ -137,14 +137,6 @@ public class User {
         this.telephoneNumber = telephoneNumber;
     }
 
-    public String getPostalAddress() {
-        return postalAddress;
-    }
-
-    public void setPostalAddress(String postalAddress) {
-        this.postalAddress = postalAddress;
-    }
-
     public String getStateProvince() {
         return stateProvince;
     }
@@ -153,12 +145,36 @@ public class User {
         this.stateProvince = stateProvince;
     }
 
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
     public List<EffectiveRole> getEffectiveRoles() {
         return effectiveRoles;
     }
 
     public void setEffectiveRoles(List<EffectiveRole> effectiveRoles) {
         this.effectiveRoles = effectiveRoles;
+    }
+
+    public List<Application> getEffectiveApplications() {
+        return effectiveApplications;
+    }
+
+    public void setEffectiveApplications(List<Application> effectiveApplications) {
+        this.effectiveApplications = effectiveApplications;
     }
 
     public String get_rev() {
@@ -192,8 +208,9 @@ public class User {
                 .add("postalCode='" + postalCode + "'")
                 .add("country='" + country + "'")
                 .add("effectiveRoles=" + effectiveRoles)
-                .add("_rev" + _rev)
-                .add("accountStatus" + accountStatus)
+                .add("effectiveApplications=" + effectiveApplications)  // Newly added
+                .add("_rev='" + _rev + "'")
+                .add("accountStatus='" + accountStatus + "'")
                 .toString();
     }
 }
