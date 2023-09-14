@@ -1,5 +1,7 @@
 package com.experianhealth.ciam.forgerock.model;
 
+import java.util.List;
+
 public class Application {
 	 private String name;
 		private String _id;
@@ -7,6 +9,7 @@ public class Application {
 	    private String _refResourceCollection;
 	    private String _refResourceId;
 	    private String _ref;
+	    private List<Application> effectiveApplications;
 	    public String getName() {
 		return name;
 	}
@@ -42,6 +45,12 @@ public class Application {
 	}
 	public void set_ref(String _ref) {
 		this._ref = _ref;
+	}
+	public List<Application> getEffectiveApplications() {
+		return effectiveApplications;
+	}
+	public void setEffectiveApplications(List<Application> effectiveApplications) {
+		this.effectiveApplications = effectiveApplications;
 	}
 	
 }

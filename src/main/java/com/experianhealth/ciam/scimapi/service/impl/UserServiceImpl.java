@@ -91,6 +91,7 @@ public class UserServiceImpl implements UserService {
             FRQuery roleQueryIds = FRQuery.Builder.create().withFilterExpression(
                     FRQueryFilter.in("_id",getIds(groups))
             ).build();
+            System.out.println(roleQueryIds);
             List<Role> roles = roleService.search(token,roleQueryIds);
             Map<String, ScimGroupReference> roleMap = toMap(scimUser.getGroups());
             for(Role role : roles){

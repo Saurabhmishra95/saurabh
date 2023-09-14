@@ -1,6 +1,8 @@
 package com.experianhealth.ciam.scimapi.service.impl;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,11 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.experianhealth.ciam.forgerock.model.Application;
+import com.experianhealth.ciam.forgerock.model.FRQuery;
+import com.experianhealth.ciam.forgerock.model.FRQueryFilter;
 import com.experianhealth.ciam.forgerock.model.User;
+import com.experianhealth.ciam.forgerock.service.ApplicationDetails;
 import com.experianhealth.ciam.forgerock.service.ForgeRockAMService;
 import com.experianhealth.ciam.forgerock.service.GeneralForgeRockIDMService;
+import com.experianhealth.ciam.forgerock.service.ManagedApplicationService;
 import com.experianhealth.ciam.forgerock.service.ManagedUserService;
-
 @RestController
 @RequestMapping("/myapplication")
 public class ApplicationController {
@@ -24,34 +29,43 @@ public class ApplicationController {
     private ForgeRockAMService forgeRockAMService;
 
     @Autowired
-    @Qualifier("managedUserServiceImpl")
-    private GeneralForgeRockIDMService generalForgeRockIDMService;
-
-
-    @Autowired
     private ManagedUserService userService;
 
+    @Autowired
+    private ManagedApplicationService managedApplicationService;
+
     @GetMapping
-    public ResponseEntity<Application> getApplicationDetails(
+    public ResponseEntity<List<ApplicationDetails>> getApplicationDetails(
             @RequestHeader(value = "Authorization") String bearerToken) {
         
         // Fetch the user using the token
         User user = forgeRockAMService.getUserInfo(bearerToken);
         
-        // Extract the user ID from the User object
-        String userId = user.get_id();
+        // Use ManagedUserService to fetch the user by ID
+        User detailedUser = userService.getById(bearerToken, user.get_id()).orElse(null);
+
+
         
-        // Fetch the application details using the token and user ID
-        Optional<Application> optionalApplication = generalForgeRockIDMService.getById(bearerToken, userId);
+        // Extract the list of effective applications
+        List<Application> effectiveApplications = detailedUser.getEffectiveApplications();
         
-        if(!optionalApplication.isPresent()) {
+        // Construct the query for fetching application details
+        FRQuery appQueryIds = FRQuery.Builder.create().withFilterExpression(
+            FRQueryFilter.in("_id", getApplicationIds(effectiveApplications))
+        ).build();
+        
+        // Fetch application details using the constructed query
+        List<ApplicationDetails> applicationDetailsList = managedApplicationService.search(bearerToken, appQueryIds);
+        
+        if(applicationDetailsList.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         
-        return ResponseEntity.ok(optionalApplication.get());
+        return ResponseEntity.ok(applicationDetailsList);
     }
 
-
-
+    private List<String> getApplicationIds(List<Application> applications) {
+        return applications.stream().map(Application::get_id).collect(Collectors.toList());
+    }
 
 }
