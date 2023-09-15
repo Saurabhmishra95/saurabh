@@ -33,27 +33,7 @@ public class ManagedApplicationServiceImpl extends AbstractForgeRockIDMServiceIm
         return APPLICATION_PATH;
     }
 
-    @Override
-    public List<ApplicationDetails> search(String token, FRQuery query) {
-        List<Application> applications = super.search(token, query);
-        
-        // Map the Application objects to ApplicationDetails objects
-        List<ApplicationDetails> detailsList = applications.stream()
-            .map(this::mapToApplicationDetails)
-            .collect(Collectors.toList());
 
-        return detailsList;
-    }
-
-    private ApplicationDetails mapToApplicationDetails(Application application) {
-        ApplicationDetails details = new ApplicationDetails();
-        
-        details.setAppId(application.get_id());
-        details.setAppName(application.getName());
-        details.setAppDescription(application.get_ref()); // Adjust this if the description is stored elsewhere in the Application object
-        
-        return details;
-    }
 
     // You can override other methods or add new methods specific to applications here.
 }
